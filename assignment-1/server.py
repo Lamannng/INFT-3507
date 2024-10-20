@@ -60,4 +60,15 @@ class UnreliableHandler(BaseHTTPRequestHandler):
         with open('logfile.json', 'a') as logfile:
             logfile.write(json.dumps(log_entry)+'\n')
 
+
+# Set up and start the server
+def run(server_class=HTTPServer, handler_class=UnreliableHandler, port=8080):
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+    print(f"Starting server on port {port}...")
+    httpd.serve_forever()
+
+if __name__=="__main__":
+    run()
+    
         

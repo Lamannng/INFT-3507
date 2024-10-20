@@ -13,7 +13,11 @@ class UnreliableHandler(BaseHTTPRequestHandler):
             self.handle_getlogs()
 
     #handling /getbalanceroute 
+<<<<<<< HEAD
     def handle_getbalance(self):
+=======
+    def handlegetbalance(self):
+>>>>>>> ddaedeffd8557a22d6e6df6e2a295434da90d0a5
         #defining event outcome with the help of probabilities
         event_outcome = random.choices([200, 403, 500, 'timeout'], [0.5, 0.2, 0.1, 0.2])[0]
         if event_outcome == 'timeout':
@@ -32,7 +36,11 @@ class UnreliableHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b"<html><body><h1>Fake Balance Data</h1></body></html>")
         #logging the outcome
+<<<<<<< HEAD
         self.log_event(event_outcome)
+=======
+        self.log_event(outcome)
+>>>>>>> ddaedeffd8557a22d6e6df6e2a295434da90d0a5
 
 
     #Handling the /getlogs route:
@@ -70,5 +78,10 @@ def run(server_class=HTTPServer, handler_class=UnreliableHandler, port=8080):
 
 if __name__=="__main__":
     run()
+<<<<<<< HEAD
         
 
+=======
+    
+        
+>>>>>>> ddaedeffd8557a22d6e6df6e2a295434da90d0a5

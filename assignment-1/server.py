@@ -51,6 +51,13 @@ class UnreliableHandler(BaseHTTPRequestHandler):
         except FileNotFoundError:
             self.wfile.write(json.dumps([]).encode()) # Returning an empty list if no logs
 
-
+        
+    # Log IP, timestamp, event outcome
+    def log_event(self, outcome):
+        ip = self.client_address[0]
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = {'timestamp' : timestamp, 'ip':ip, 'outcome': outcome}
+        with open('logfile.json', 'a') as logfile:
+            logfile.write(json.dumps(log_entry)+'\n')
 
         

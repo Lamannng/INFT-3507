@@ -34,4 +34,23 @@ class UnreliableHandler(BaseHTTPRequestHandler):
         #logging the outcome
         self.log_event(outcome)
 
+
+    #Handling the /getlogs route:
+    def handle_getlogs(self):
+        self.send_response(200)
+        self.send_header('Content-type','application/json')
+        self.end_headers()
+
+        #reading the log file
+        try:
+            with open('logfile.json', 'r') as logfile:
+                logs = logfile.readlines()
+                #conerting logs to json list
+                logs_json = [json.loads(log.strip()) for log in logs]
+                self.wfile.write(json.dumps(logs_json).encode())
+        except FileNotFoundError:
+            self.wfile.write(json.dumps([]).encode()) # Returning an empty list if no logs
+
+
+
         

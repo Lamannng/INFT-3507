@@ -13,15 +13,14 @@ class UnreliableHandler(BaseHTTPRequestHandler):
             self.handle_getlogs()
 
     #handling /getbalanceroute 
-<<<<<<< HEAD
     def handle_getbalance(self):
-=======
-    def handlegetbalance(self):
->>>>>>> ddaedeffd8557a22d6e6df6e2a295434da90d0a5
         #defining event outcome with the help of probabilities
         event_outcome = random.choices([200, 403, 500, 'timeout'], [0.5, 0.2, 0.1, 0.2])[0]
         if event_outcome == 'timeout':
             time.sleep(10) #simulating server timeout
+            #adding a response indicating that the server timed out, so the client doesn't hang indefinitely
+            self.send_error(504, "Gateway Timeout")
+            self.end_headers()
             return
         elif event_outcome == 403:
             self.send_response(403)
@@ -36,12 +35,7 @@ class UnreliableHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b"<html><body><h1>Fake Balance Data</h1></body></html>")
         #logging the outcome
-<<<<<<< HEAD
         self.log_event(event_outcome)
-=======
-        self.log_event(outcome)
->>>>>>> ddaedeffd8557a22d6e6df6e2a295434da90d0a5
-
 
     #Handling the /getlogs route:
     def handle_getlogs(self):
@@ -64,10 +58,18 @@ class UnreliableHandler(BaseHTTPRequestHandler):
     def log_event(self, outcome):
         ip = self.client_address[0]
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        log_entry = {'timestamp' : timestamp, 'ip':ip, 'outcome': outcome}
-        with open('logfile.json', 'a') as logfile:
-            logfile.write(json.dumps(log_entry)+'\n')
+        log_entry = {'timestamp': timestamp, 'ip': ip, 'outcome': outcome}
+        
+        try:
+            with open('logfile.json', 'r') as logfile:
+                logs = json.load(logfile)
+        except (FileNotFoundError, json.JSONDecodeError):
+            logs = []
 
+        logs.append(log_entry)
+        
+        with open('logfile.json', 'w') as logfile:
+            json.dump(logs, logfile, indent=4)
 
 # Set up and start the server
 def run(server_class=HTTPServer, handler_class=UnreliableHandler, port=8080):
@@ -78,10 +80,3 @@ def run(server_class=HTTPServer, handler_class=UnreliableHandler, port=8080):
 
 if __name__=="__main__":
     run()
-<<<<<<< HEAD
-        
-
-=======
-    
-        
->>>>>>> ddaedeffd8557a22d6e6df6e2a295434da90d0a5

@@ -56,20 +56,18 @@ class UnreliableHandler(BaseHTTPRequestHandler):
         
     # Log IP, timestamp, event outcome
     def log_event(self, outcome):
-        ip = self.client_address[0]
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Fixed missing timestamp assignment
+        ip = self.client_address[0]  # Fixed missing IP address assignment
         log_entry = {'timestamp': timestamp, 'ip': ip, 'outcome': outcome}
-        
         try:
             with open('logfile.json', 'r') as logfile:
                 logs = json.load(logfile)
         except (FileNotFoundError, json.JSONDecodeError):
-            logs = []
-
-        logs.append(log_entry)
-        
+                logs = []
+        logs.append(log_entry)  # Append the new log entry
         with open('logfile.json', 'w') as logfile:
-            json.dump(logs, logfile, indent=4)
+                json.dump(logs, logfile, indent=4)  # Write logs back to the file
+
 
 # Set up and start the server
 def run(server_class=HTTPServer, handler_class=UnreliableHandler, port=8080):

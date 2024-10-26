@@ -76,6 +76,7 @@ class UnreliableHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_response(404)
                 self.end_headers()
                 self.wfile.write(b"Log file not found")
+                
 
 # Start the server
 with socketserver.TCPServer(("", PORT), UnreliableHTTPRequestHandler) as httpd:

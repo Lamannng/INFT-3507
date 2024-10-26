@@ -21,9 +21,20 @@ class UnreliableHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             'ip_address': ip_address,
             'status_code': status_code
         }
-        # Append each event as a JSON line in the log file
-        with open(log_file, 'a') as f:
-            f.write(json.dumps(log_entry) + '\n')
+        
+        # Read existing log entries
+        try:
+            with open(log_file, 'r') as f:
+                logs = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            logs = []
+
+        # Append new log entry
+        logs.append(log_entry)
+
+        # Write all log entries back to the log file as a JSON array
+        with open(log_file, 'w') as f:
+            json.dump(logs, f, indent=4)
 
     def do_GET(self):
         """
@@ -56,23 +67,28 @@ class UnreliableHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(b"500 Internal Server Error")
                 self.log_event(ip_address, 500)
             elif outcome == 'timeout':
-                # Simulate a timeout by not responding
+                self.send_response(504)  # Gateway Timeout response
+                self.end_headers()
                 self.log_event(ip_address, 'timeout')
-                time.sleep(5)  # Timeout duration to simulate
+                time.sleep(5)  # Simulating delay
 
         # Handle /getlogs route to serve log file content in JSON format
         elif self.path == '/getlogs':
             try:
                 with open(log_file, 'r') as f:
-                    logs = [json.loads(log.strip()) for log in f.readlines()]
+                    logs = json.load(f)  # Read logs as JSON
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps(logs).encode())
+                self.wfile.write(json.dumps(logs, indent=4).encode())
             except FileNotFoundError:
                 self.send_response(404)
                 self.end_headers()
                 self.wfile.write(b"Log file not found")
+            except json.JSONDecodeError:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(b"Error reading log file")
 
 # Start the server
 with socketserver.TCPServer(("", PORT), UnreliableHTTPRequestHandler) as httpd:

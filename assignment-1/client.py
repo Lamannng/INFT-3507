@@ -27,7 +27,7 @@ def get_logs():
         response = requests.get(f"{base_url}/getlogs")
         print(f"GET /getlogs - Status Code: {response.status_code}")
         if response.status_code == 200:
-            print("Logs:", response.json())
+            print("Logs:\n", response.text)
         else:
             print("Error Response:", response.text)
     except requests.exceptions.RequestException as e:

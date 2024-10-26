@@ -1,4 +1,5 @@
 import requests
+import time
 
 # Base URL of the server (update host and port as necessary)
 base_url = 'http://localhost:8080'
@@ -37,5 +38,6 @@ def get_logs():
 if __name__ == "__main__":
     for _ in range(100):  # Calling /getbalance multiple times
         get_balance()
+        time.sleep(0.1)  # Adding a slight delay between requests to mimic real-world usage
     
     get_logs()  # Retrieve and display logs

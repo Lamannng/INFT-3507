@@ -2,8 +2,8 @@ import http.server
 import socketserver
 import random
 import json
-import time
 from datetime import datetime
+import time
 
 # Port for server (adjustable)
 PORT = 8080  # Use an available port
@@ -36,10 +36,11 @@ class UnreliableHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/getbalance':
             outcome = random.choices(
                 population=['200', '403', '500', 'timeout'],
-                weights=[50, 20, 10, 20],  # Updated probability distribution
+                weights=[50, 20, 10, 20],  # Probability distribution
                 k=1
             )[0]
             
+            # Sending the appropriate response based on the outcome
             if outcome == '200':
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')

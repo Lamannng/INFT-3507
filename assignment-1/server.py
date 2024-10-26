@@ -36,7 +36,7 @@ class UnreliableHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/getbalance':
             outcome = random.choices(
                 population=['200', '403', '500', 'timeout'],
-                weights=[50, 20, 10, 20],  # Probability distribution
+                weights=[50, 20, 10, 20],  # Updated probability distribution
                 k=1
             )[0]
             
@@ -57,10 +57,10 @@ class UnreliableHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(b"500 Internal Server Error")
                 self.log_event(ip_address, 500)
             elif outcome == 'timeout':
-                self.send_response(504)  # Gateway Timeout response
-                self.end_headers()
+                # Instead of sending a response, just log the event
                 self.log_event(ip_address, 'timeout')
                 time.sleep(5)  # Simulating delay
+                return  # Return without sending a response
 
         # Handle /getlogs route to serve log file content in JSON format
         elif self.path == '/getlogs':

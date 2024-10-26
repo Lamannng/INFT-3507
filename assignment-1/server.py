@@ -2,8 +2,8 @@ import http.server
 import socketserver
 import random
 import json
-from datetime import datetime
 import time
+from datetime import datetime
 
 # Port for server (adjustable)
 PORT = 8080  # Use an available port
@@ -15,6 +15,7 @@ class UnreliableHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def log_event(self, ip_address, status_code):
         """
         Logs each event with timestamp, IP address, and status code.
+        Each log entry is saved as a JSON object on a new line.
         """
         log_entry = {
             "timestamp": datetime.now().isoformat(),
@@ -32,15 +33,14 @@ class UnreliableHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         """
         ip_address = self.client_address[0]  # IP address of client
         
-        # Handle /getbalance route with probability-based responses
+        # Handle /getbalance route with specified probability distribution
         if self.path == '/getbalance':
             outcome = random.choices(
                 population=['200', '403', '500', 'timeout'],
-                weights=[50, 20, 10, 20],  # Probability distribution
+                weights=[50, 20, 10, 20],  # Adjusted probability distribution
                 k=1
             )[0]
             
-            # Sending the appropriate response based on the outcome
             if outcome == '200':
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')

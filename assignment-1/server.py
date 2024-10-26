@@ -2,6 +2,7 @@ import http.server
 import socketserver
 import random
 import json
+import time
 from datetime import datetime
 
 # Set the port for the server
@@ -13,26 +14,30 @@ log_file = 'logfile.json'
 # Handler for HTTP requests
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
     def log_event(self, ip_address, status_code):
-        # Prepare log entry
+        """Logs the event to a JSON file with timestamp, IP address, and status code."""
         log_entry = {
             'timestamp': datetime.now().isoformat(),
             'ip_address': ip_address,
             'status_code': status_code
         }
-        
-        # Write log entry to log file
         with open(log_file, 'a') as f:
             f.write(json.dumps(log_entry) + '\n')
 
     def do_GET(self):
-        ip_address = self.client_address[0]  # Get client IP address
-        
+        ip_address = self.client_address[0]
+
         if self.path == '/getbalance':
             outcome = random.choices(
                 population=[200, 403, 500, 'timeout'],
                 weights=[50, 20, 10, 20],
                 k=1
             )[0]
+
+            if outcome == 'timeout':
+                # Simulate a timeout by not responding
+                self.log_event(ip_address, 'timeout')
+                time.sleep(5)
+                return
 
             if outcome == 200:
                 self.send_response(200)
@@ -50,15 +55,11 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(b"500 Internal Server Error")
                 self.log_event(ip_address, 500)
-            else:  # Handle timeout (not responding)
-                self.log_event(ip_address, 'timeout')
-                return  # Simply do nothing to simulate a timeout
 
         elif self.path == '/getlogs':
             try:
                 with open(log_file, 'r') as f:
-                    logs = f.readlines()
-                    logs = [json.loads(log) for log in logs]
+                    logs = [json.loads(log) for log in f.readlines()]
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()

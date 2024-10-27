@@ -31,6 +31,7 @@ percentage_403 = (count_403 / total_requests) * 100
 percentage_500 = (count_500 / total_requests) * 100
 percentage_timeout = (count_timeout / total_requests) * 100
 
+
 # Print results
 print(f"200: {percentage_200:.2f}%")
 print(f"403: {percentage_403:.2f}%")

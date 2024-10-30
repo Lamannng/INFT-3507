@@ -174,7 +174,7 @@ if __name__ == "__main__":
     port = sys.argv[2]
     base_url = get_base_url(ip_address, port)
 
-    # Test the /getbalance endpoint with multiple requests
+    # testing /getbalance endpoint with multiple requests
     for _ in range(100):
         get_balance(base_url)
     
